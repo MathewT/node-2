@@ -35,31 +35,42 @@ services:
       - esnet
   postgres-0:
     image: postgres:10.3-alpine
+    container_name: postgres-0
     ports:
       - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: swordfish
+    networks: 
+      - esnet
   postgres-1:
     image: postgres:10.3-alpine
+    container_name: postgres-1
     ports:
       - "5434:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: swordfish
+    networks: 
+      - esnet
   web-app:
-    container_name: node-2-web-app
+    container_name: web-app
     depends_on:
       - postgres-0
       - postgres-1
+      - elasticsearch
     links:
-      - postgres-0
+      - postgres-0:db0.local
+      - postgres-1:db1.local
+      - elasticsearch:es0.local
     image: mthomas/node-2
     ports:
       - "3000:3000"
       - "3001:3001"
     volumes:
       - ./src:/usr/src/app/src 
+    networks: 
+      - esnet
 
 volumes:
   esdata1:
